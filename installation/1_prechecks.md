@@ -19,12 +19,39 @@
 Example: `$ echo 1 > /proc/sys/vm/swappiness && echo "vm.swappiness = 1" >> /etc/sysctl.conf && cat /proc/sys/vm/swappiness`
 
 ## <center> File access time (noatime)
-**Note:** Only updated on worker nodes
-**Issue:** Had to add second volumes on worker nodes as on AWS that was used there was a single volumne with XFS file system and limited space. By adding a second volume it was easy to format it in ext4 file format.
+* Edit fstab
+`$ vi /etc/fstab`
+```
+#
+# /etc/fstab
+#
+# /etc/fstab
+# Created by anaconda on Mon Nov  9 20:20:10 2015
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk'
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info
+#
+UUID=379de64d-ea11-4f5b-ae6a-0aa50ff7b24d /                       xfs     defaults,noatime        0 0
+```
+* Apply
+`mount -o remount /`
 
 ## <center> SELinux
 * Disabled SELinux on all servers (on boot)
-<code>$ /etc/selinux/config</code>
+<code>$ vi /etc/selinux/config</code>
+```
+# This file controls the state of SELinux on the system.
+# SELINUX= can take one of these three values:
+#     enforcing - SELinux security policy is enforced.
+#     permissive - SELinux prints warnings instead of enforcing.
+#     disabled - No SELinux policy is loaded.
+SELINUX=disabled
+# SELINUXTYPE= can take one of three two values:
+#     targeted - Targeted processes are protected,
+#     minimum - Modification of targeted policy. Only selected processes are protected.
+#     mls - Multi Level Security protection.
+SELINUXTYPE=targeted
+```
 * Disable SELinux immediately
 <code>$ setenforce 0</code>
 
@@ -34,6 +61,8 @@ Example: `$ echo 1 > /proc/sys/vm/swappiness && echo "vm.swappiness = 1" >> /etc
 <code>[always] madvise never</code>
 
 **Note:** Used to be "redhat_transparent_hugepage". In RHEL 7.2 it's "transparent_hugepage"
+* Edit /etc/rc.local
+`$ vi /etc/rc.local`
 * Set transparent hugepage on boot using script
 ```$ if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
    echo never > /sys/kernel/mm/transparent_hugepage/enabled
@@ -46,7 +75,7 @@ fi```
 
 ## <center> Name Service Cashe Daemon (nscd)
 * Had to install the service
-`$ yum install nscd`
+`$ yum install nscd -y`
 * Had to modify the config for nscd (RHEL 7.2)
 `$ vi /etc/nscd.conf
 * Settings used:
@@ -55,9 +84,13 @@ fi```
 	* enable-cache group no
 	* enable-cache netgroup no
 * Enabled nscd
-`chkconfig --level 345 nscd on`
+`$ chkconfig --level 345 nscd on`
+```
+Created symlink from /etc/systemd/system/multi-user.target.wants/nscd.service to /usr/lib/systemd/system/nscd.service.
+Created symlink from /etc/systemd/system/sockets.target.wants/nscd.socket to /usr/lib/systemd/system/nscd.socket.
+```
 * Started the service
-`service nscd start`
+`$ service nscd start`
 
 ## <center> DNS
 * Installed bind utils
@@ -74,6 +107,8 @@ fi```
 * Private IP
 `$ host 172.31.34.101`
 `101.34.31.172.in-addr.arpa domain name pointer ip-172-31-34-101.eu-west-1.compute.internal.`
+
+**Note:** The process was repeaded on all other nodes
 
 ## <center> NTP
 **Note:** Skipped all machines running on EU (Ireland) - AWS. No issues expected. If issues happen NPT will be setup later.
