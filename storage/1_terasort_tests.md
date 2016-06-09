@@ -1,4 +1,14 @@
 # <center> Storage Lab
+## <center> Replicate to another cluster
+* Create dir for partner
+`sudo -u hdfs dfs mkdir /tmp/waelbou`
+* Change access rights
+`sudo -u hdfs hdfs dfs -chmod -R 1777 /tmp`
+* Check directory
+`sudo -u hdfs hdfs dfs -ls -R /tmp`
+* Get files from
+`sudo -u hdfs mapred distcp hftp://ec2-52-51-219-5.eu-west-1.compute.amazonaws.com:50070/tmp/waelbou hdfs://ec2-52-208-1-52.eu-west-1.compute.amazonaws.com/tmp/waelbou`
+<center><img src=C:\Users\andre\Documents\GitHub\cloudera\storage\0_partnerGitHub_yourGitHub.png><center>
 ## <center> HDFS performance
 * Find test jar location
 `find / -name 'hadoop-*example*.jar'`
@@ -260,3 +270,8 @@ real    1m22.138s
 user    0m8.006s
 sys     0m0.293s
 ```
+## <Center> Enable HDFS HA
+* HA - Namenode 
+<center><img src=C:\Users\andre\Documents\GitHub\cloudera\storage\2_HDFS_HA.png><center>
+* Users
+<center><img src=C:\Users\andre\Documents\GitHub\cloudera\storage\3_CM_users.png><center>
